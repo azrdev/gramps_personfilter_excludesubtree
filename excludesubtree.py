@@ -3,6 +3,7 @@ from gramps.gen.const import GRAMPS_LOCALE as glocale
 _ = glocale.translation.gettext
 from gramps.gen.filters.rules.person import MatchesFilter
 from gramps.gen.filters.rules import Rule
+from gramps.gui.editors.filtereditor import MyBoolean, MyID
 
 
 def get_relatives(db, person):
@@ -31,9 +32,11 @@ def get_relatives(db, person):
 
 class ExcludeSubtree(Rule):
     labels = [
-        # strings must match gramps.gui.editors.filtereditor.EditRule.__init__
-        _('ID:'),
-        _('Person filter name:'),  # TODO: also make family possible?
+        # see gramps.gui.editors.filtereditor.EditRule.__init__
+        # must be (label, widget class) or special string as label
+        (_('Starting Person:'), MyID),
+        (_('Include filter matches'), MyBoolean),
+        _('Person filter name:'),  # TODO: also allow family filter
     ]
     name = _("People reachable from <Person>, stopping at <Filter> matches")
     category = _("Relationship filters")
@@ -49,7 +52,8 @@ class ExcludeSubtree(Rule):
                                 db.get_number_of_people())
         try:
             start = db.get_person_from_gramps_id(self.list[0]).handle
-            self.filt = MatchesFilter(self.list[1:])
+            include_matched = bool(int(self.list[1]))
+            self.filt = MatchesFilter(self.list[2:])
             self.filt.requestprepare(db, user)
 
             # walk the db using a queue
@@ -62,7 +66,9 @@ class ExcludeSubtree(Rule):
                 if current_h in self.matched_relatives:
                     continue  # already got them
                 if self.filt.apply(db, current):
-                    continue  # exclude them
+                    if include_matched:
+                        self.matched_relatives.add(current_h)
+                    continue  # stop at filter matches
                 self.matched_relatives.add(current_h)
                 # add their relatives to the search
                 search_list.extend((h
