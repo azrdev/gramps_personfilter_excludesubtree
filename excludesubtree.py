@@ -3,7 +3,7 @@ from gramps.gen.const import GRAMPS_LOCALE as glocale
 _ = glocale.translation.gettext
 from gramps.gen.filters.rules.person import MatchesFilter
 from gramps.gen.filters.rules import Rule
-from gramps.gui.editors.filtereditor import MyBoolean, MyID
+from gramps.gui.editors.filtereditor import MyBoolean
 
 
 def get_relatives(db, person):
@@ -34,7 +34,7 @@ class ExcludeSubtree(Rule):
     labels = [
         # see gramps.gui.editors.filtereditor.EditRule.__init__
         # must be (label, widget class) or special string as label
-        (_('Starting Person:'), MyID),
+        _('ID:'),  # starting person
         (_('Include filter matches'), MyBoolean),
         _('Person filter name:'),  # TODO: also allow family filter
     ]
