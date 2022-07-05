@@ -11,7 +11,7 @@ register(RULE,
   name  = _("All people, starting at <person>, except those in/behind <filter>"),
   description = _("Matches people who are reachable starting from <person> "
       "except those in <filter>."),
-  version = '0.3',
+  version = '0.4',
   authors = ["Jonathan Biegert"],
   authors_email = ["azrdev@gmail.com"],
   gramps_target_version = '5.1',

@@ -30,12 +30,24 @@ def get_relatives(db, person):
                     yield child_ref.ref
 
 
+class GUICheckBox(MyBoolean):
+    """
+    Input widget for a boolean filter rule parameter.
+
+    Needed because gramps.gui.editors.filtereditor defines MyBoolean widget
+    with a single `label: str` parameter, but creates custom widgets with a
+    single argument `db` in EditRule.__init__
+    """
+    def __init__(self, db, *args, **kwargs):
+        super().__init__('', *args, **kwargs)  # first argument must be string (hidden label)
+
+
 class ExcludeSubtree(Rule):
     labels = [
         # see gramps.gui.editors.filtereditor.EditRule.__init__
         # must be (label, widget class) or special string as label
         _('ID:'),  # starting person
-        (_('Include filter matches'), MyBoolean),
+        (_('Include filter matches'), GUICheckBox),
         _('Person filter name:'),  # TODO: also allow family filter
     ]
     name = _("People reachable from <Person>, stopping at <Filter> matches")
