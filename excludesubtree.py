@@ -1,9 +1,14 @@
 import itertools
+import logging
+
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 _ = glocale.translation.gettext
 from gramps.gen.filters.rules.person import MatchesFilter
 from gramps.gen.filters.rules import Rule
 from gramps.gui.editors.filtereditor import MyBoolean
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_relatives(db, person):
@@ -74,10 +79,11 @@ class ExcludeSubtree(Rule):
                 if user:
                     user.step_progress()
                 current_h = search_list.pop()
-                current = db.get_person_from_handle(current_h)
                 if current_h in self.matched_relatives:
                     continue  # already got them
+                current = db.get_person_from_handle(current_h)
                 if self.filt.apply(db, current):
+                    LOG.debug("Stopping at filter match %s", current.gramps_id)
                     if include_matched:
                         self.matched_relatives.add(current_h)
                     continue  # stop at filter matches
@@ -86,6 +92,7 @@ class ExcludeSubtree(Rule):
                 search_list.extend((h
                                     for h in get_relatives(db, current)
                                     if h))
+            LOG.debug("Found %d relatives", len(self.matched_relatives))
 
         finally:
             if user:
