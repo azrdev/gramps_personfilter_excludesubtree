@@ -11,12 +11,12 @@ register(RULE,
   name  = _("All people, starting at <person>, except those in/behind <filter>"),
   description = _("Matches people who are reachable starting from <person> "
       "except those in <filter>."),
-  version = '0.4',
+  version = '0.5',
   authors = ["Jonathan Biegert"],
   authors_email = ["azrdev@gmail.com"],
-  gramps_target_version = '5.1',
-  status = UNSTABLE,
+  gramps_target_version = '6.0',
+  status = BETA,
   fname = "excludesubtree.py",
   ruleclass = 'ExcludeSubtree',  # must be rule class name
   namespace = 'Person',  # one of the primary object classes
-  )
+)

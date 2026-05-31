@@ -59,7 +59,7 @@ class ExcludeSubtree(Rule):
     category = _("Relationship filters")
     description = _("People reachable from <Person>, stopping at <Filter> matches")
 
-    def prepare(self, db, user):
+    def prepare(self, db: Database, user):
         self.reset()
         self.db = db
 
@@ -82,7 +82,8 @@ class ExcludeSubtree(Rule):
                 if current_h in self.matched_relatives:
                     continue  # already got them
                 current = db.get_person_from_handle(current_h)
-                if self.filt.apply(db, current):
+                LOG.debug("tree walk arrived at id %s", current.gramps_id)
+                if self.filt.apply_to_one(db, current):
                     LOG.debug("Stopping at filter match %s", current.gramps_id)
                     if include_matched:
                         self.matched_relatives.add(current_h)
@@ -101,5 +102,5 @@ class ExcludeSubtree(Rule):
     def reset(self):
         self.matched_relatives = set()  # set of person handles
 
-    def apply(self, db, person):
+    def apply_to_one(self, db: Database, person: Person) -> bool:
         return person.handle in self.matched_relatives
