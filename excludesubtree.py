@@ -41,7 +41,7 @@ _ = glocale.translation.gettext
 # Typing modules
 #
 # -------------------------------------------------------------------------
-from typing import Set
+from typing import List, Set
 from gramps.gen.lib import Person
 from gramps.gen.db import Database
 
@@ -57,21 +57,21 @@ def get_relatives(db, person):
     """
     if person:
         for h in itertools.chain(
-                # person as child
-                person.get_parent_family_handle_list(),
-                # person as parent
-                person.get_family_handle_list(),
-                ):
+            # person as child
+            person.get_parent_family_handle_list(),
+            # person as parent
+            person.get_family_handle_list(),
+        ):
             family = db.get_family_from_handle(h)
             if family:
                 # parents / spouse
-                for parent in (family.get_father_handle(),
-                               family.get_mother_handle()):
+                for parent in (family.get_father_handle(), family.get_mother_handle()):
                     if parent:
                         yield parent
                 # siblings / children
                 for child_ref in family.get_child_ref_list():
                     yield child_ref.ref
+
 
 # -------------------------------------------------------------------------
 #
@@ -94,24 +94,28 @@ class ExcludeSubtree(Rule):
         # rule parameters, see
         # gramps.gui.editors.filtereditor.EditRule.__init__
         # must be (label, widget class) or special string as label
-        _('ID:'),  # starting person
-        _('Handle filter matches: include (default), exclude'),
-        _('Person filter name:'),  # TODO: also allow family filter
+        _("ID:"),  # starting person
+        _("Handle filter matches: include (default), exclude"),
+        _("Person filter name:"),  # TODO: also allow family filter
     ]
     name = _("People reachable from <Person>, stopping at <Filter> matches")
     category = _("Relationship filters")
-    description = _("Matches people who are reachable starting from <Person> "
-                    "(walking all parents and children of attached families, "
-                    "recursively) stopping at persons in <Filter>.")
+    description = _(
+        "Matches people who are reachable starting from <Person> "
+        "(walking all parents and children of attached families, "
+        "recursively) stopping at persons in <Filter>."
+    )
 
     def prepare(self, db: Database, user):
         self.reset()
         self.db = db
 
         if user:
-            user.begin_progress(self.category,
-                                _('Retrieving all sub-filter matches'),
-                                db.get_number_of_people())
+            user.begin_progress(
+                self.category,
+                _("Retrieving all sub-filter matches"),
+                db.get_number_of_people(),
+            )
         try:
             # initialize search from filter parameters (passed as self.list)
             start_person = db.get_person_from_gramps_id(self.list[0])
@@ -139,9 +143,7 @@ class ExcludeSubtree(Rule):
                     continue  # stop at filter matches
                 # whitelist person and add their relatives to the queue
                 self.selected_handles.add(current_h)
-                search_list.extend((h
-                                    for h in get_relatives(db, current)
-                                    if h))
+                search_list.extend((h for h in get_relatives(db, current) if h))
             LOG.debug("Found %d relatives", len(self.selected_handles))
 
         finally:

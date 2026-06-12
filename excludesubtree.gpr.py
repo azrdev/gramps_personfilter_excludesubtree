@@ -18,18 +18,21 @@
 #
 
 # https://github.com/gramps-project/gramps/blob/master/gramps/gen/plug/_pluginreg.py
-register(RULE,
-  id    = 'ExcludeSubtree',
-  name  = _("People reachable from <Person>, stopping at <Filter> matches"),
-  description = _("Matches people who are reachable starting from <Person> "
-                  "(walking all parents and children of attached families, "
-                  "recursively) stopping at persons in <Filter>."),
-  version = '0.5',
-  authors = ["Jonathan Biegert"],
-  authors_email = ["azrdev@gmail.com"],
-  gramps_target_version = '6.0',
-  status = BETA,
-  fname = "excludesubtree.py",
-  ruleclass = 'ExcludeSubtree',  # must be rule class name
-  namespace = 'Person',  # one of the primary object classes
+register(
+    RULE,
+    id="ExcludeSubtree",
+    name=_("People reachable from <Person>, stopping at <Filter> matches"),
+    description=_(
+        "Matches people who are reachable starting from <Person> "
+        "(walking all parents and children of attached families, "
+        "recursively) stopping at persons in <Filter>."
+    ),
+    version="0.5",
+    authors=["Jonathan Biegert"],
+    authors_email=["azrdev@gmail.com"],
+    gramps_target_version="6.0",
+    status=BETA,
+    fname="excludesubtree.py",
+    ruleclass="ExcludeSubtree",  # must be rule class name
+    namespace="Person",  # one of the primary object classes
 )
