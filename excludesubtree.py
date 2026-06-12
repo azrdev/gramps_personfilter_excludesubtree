@@ -33,7 +33,6 @@ import logging
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.filters.rules.person import MatchesFilter
 from gramps.gen.filters.rules import Rule
-from gramps.gui.editors.filtereditor import MyBoolean
 
 _ = glocale.translation.gettext
 
@@ -74,19 +73,6 @@ def get_relatives(db, person):
                 for child_ref in family.get_child_ref_list():
                     yield child_ref.ref
 
-
-class GUICheckBox(MyBoolean):
-    """
-    Input widget for a boolean filter rule parameter.
-
-    Needed because gramps.gui.editors.filtereditor defines MyBoolean widget
-    with a single `label: str` parameter, but creates custom widgets with a
-    single argument `db` in EditRule.__init__
-    """
-    def __init__(self, db, *args, **kwargs):
-        super().__init__('', *args, **kwargs)  # first argument must be string (hidden label)
-
-
 # -------------------------------------------------------------------------
 #
 # ExcludeSubtree
@@ -109,7 +95,7 @@ class ExcludeSubtree(Rule):
         # gramps.gui.editors.filtereditor.EditRule.__init__
         # must be (label, widget class) or special string as label
         _('ID:'),  # starting person
-        (_('Include filter matches'), GUICheckBox),
+        _('Handle filter matches: include (default), exclude'),
         _('Person filter name:'),  # TODO: also allow family filter
     ]
     name = _("People reachable from <Person>, stopping at <Filter> matches")
@@ -131,7 +117,7 @@ class ExcludeSubtree(Rule):
             start_person = db.get_person_from_gramps_id(self.list[0])
             if start_person is None:
                 return
-            include_matched = bool(int(self.list[1]))
+            include_stopfilter_matches = self.list[1] != "exclude"
             self.filt = MatchesFilter(self.list[2:])
             self.filt.requestprepare(db, user)
 
@@ -145,13 +131,14 @@ class ExcludeSubtree(Rule):
                     user.step_progress()
                 current = db.get_person_from_handle(current_h)
                 LOG.debug("tree walk arrived at id %s", current.gramps_id)
+                # check stop filter
                 if self.filt.apply_to_one(db, current):
                     LOG.debug("Stopping at filter match %s", current.gramps_id)
-                    if include_matched:
+                    if include_stopfilter_matches:
                         self.selected_handles.add(current_h)
                     continue  # stop at filter matches
+                # whitelist person and add their relatives to the queue
                 self.selected_handles.add(current_h)
-                # add their relatives to the search
                 search_list.extend((h
                                     for h in get_relatives(db, current)
                                     if h))
