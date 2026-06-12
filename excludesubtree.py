@@ -34,7 +34,11 @@ from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.filters.rules.person import MatchesFilter
 from gramps.gen.filters.rules import Rule
 
-_ = glocale.translation.gettext
+try:
+    _trans = glocale.get_addon_translator(__file__)
+except ValueError:
+    _trans = glocale.translation
+_ = _trans.gettext
 
 # -------------------------------------------------------------------------
 #
