@@ -140,17 +140,19 @@ class ExcludeSubtree(Rule):
                 if user:
                     user.step_progress()
                 current = db.get_person_from_handle(current_h)
-                LOG.debug("tree walk arrived at id %s", current.gramps_id)
+                if LOG.isEnabledFor(logging.DEBUG):
+                    LOG.debug("tree walk arrived at id %s", current.gramps_id)
                 # check stop filter
                 if self.filt.apply_to_one(db, current):
-                    LOG.debug("Stopping at filter match %s", current.gramps_id)
+                    if LOG.isEnabledFor(logging.DEBUG):
+                        LOG.debug("Stopping at filter match %s", current.gramps_id)
                     if include_stopfilter_matches:
                         self.selected_handles.add(current_h)
                     continue  # stop at filter matches
                 # whitelist person and add their relatives to the queue
                 self.selected_handles.add(current_h)
                 search_list.extend((h for h in get_relatives(db, current) if h))
-            LOG.debug("Found %d relatives", len(self.selected_handles))
+            LOG.debug("Found %d filter matches", len(self.selected_handles))
 
         finally:
             if user:
