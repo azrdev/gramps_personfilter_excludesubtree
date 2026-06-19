@@ -101,7 +101,6 @@ class ExcludeSubtree(Rule):
         # gramps.gui.editors.filtereditor.EditRule.__init__
         # must be (label, widget class) or special string as label
         _("ID:"),  # starting person
-        _("Handle filter matches: include (default), exclude"),
         _("Person filter name:"),  # TODO: also allow family filter
     ]
     name = _("People reachable from <Person>, stopping at <Filter> matches")
@@ -127,8 +126,7 @@ class ExcludeSubtree(Rule):
             start_person = db.get_person_from_gramps_id(self.list[0])
             if start_person is None:
                 return
-            include_stopfilter_matches = self.list[1] != "exclude"
-            self.filt = MatchesFilter(self.list[2:])
+            self.filt = MatchesFilter(self.list[1:])
             self.filt.requestprepare(db, user)
 
             # walk the db using a queue
@@ -146,8 +144,6 @@ class ExcludeSubtree(Rule):
                 if self.filt.apply_to_one(db, current):
                     if LOG.isEnabledFor(logging.DEBUG):
                         LOG.debug("Stopping at filter match %s", current.gramps_id)
-                    if include_stopfilter_matches:
-                        self.selected_handles.add(current_h)
                     continue  # stop at filter matches
                 # whitelist person and add their relatives to the queue
                 self.selected_handles.add(current_h)
