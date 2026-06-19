@@ -22,6 +22,7 @@
 # Standard Python modules
 #
 # -------------------------------------------------------------------------
+from __future__ import annotations
 import itertools
 import logging
 
